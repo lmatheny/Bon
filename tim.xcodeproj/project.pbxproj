@@ -38,6 +38,7 @@
 		5AE6F7E82B36134E0005855A /* CurrentPlansViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6F7E72B36134E0005855A /* CurrentPlansViewModel.swift */; };
 		5AE6F7EA2B36137F0005855A /* CurrentPlans.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6F7E92B36137F0005855A /* CurrentPlans.swift */; };
 		5AE6F7EC2B363F210005855A /* PlanInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6F7EB2B363F210005855A /* PlanInfoView.swift */; };
+		5AE6F7EE2B3D0B9E0005855A /* InfoCalDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6F7ED2B3D0B9E0005855A /* InfoCalDiff.swift */; };
 		AC8EE69FC7FDEECFCA07AA04 /* Pods_tim.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E853E1A67A8DE31FA36B0A4 /* Pods_tim.framework */; };
 /* End PBXBuildFile section */
 
@@ -75,6 +76,7 @@
 		5AE6F7E72B36134E0005855A /* CurrentPlansViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentPlansViewModel.swift; sourceTree = "<group>"; };
 		5AE6F7E92B36137F0005855A /* CurrentPlans.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentPlans.swift; sourceTree = "<group>"; };
 		5AE6F7EB2B363F210005855A /* PlanInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanInfoView.swift; sourceTree = "<group>"; };
+		5AE6F7ED2B3D0B9E0005855A /* InfoCalDiff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoCalDiff.swift; sourceTree = "<group>"; };
 		7242857F0B7C36CE170D5A90 /* Pods-tim.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tim.debug.xcconfig"; path = "Target Support Files/Pods-tim/Pods-tim.debug.xcconfig"; sourceTree = "<group>"; };
 		8E853E1A67A8DE31FA36B0A4 /* Pods_tim.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_tim.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -160,6 +162,7 @@
 				5A3CF8C12B2D24E500D5E53E /* CreatePlanView.swift */,
 				5AE6F7E52B3212B00005855A /* HistoryView.swift */,
 				5AE6F7EB2B363F210005855A /* PlanInfoView.swift */,
+				5AE6F7ED2B3D0B9E0005855A /* InfoCalDiff.swift */,
 			);
 			path = tim;
 			sourceTree = "<group>";
@@ -331,6 +334,7 @@
 				5A4E87172A546B5A003574C4 /* PlannerView.swift in Sources */,
 				5A42483F2AE3262F000EE865 /* LiftInfoView.swift in Sources */,
 				5A4E872C2A54FC89003574C4 /* TodoViewModel.swift in Sources */,
+				5AE6F7EE2B3D0B9E0005855A /* InfoCalDiff.swift in Sources */,
 				5A4E87292A54FC0D003574C4 /* Todo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
