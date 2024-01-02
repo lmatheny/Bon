@@ -5,6 +5,10 @@ import FirebaseFirestore
 import FirebaseStorage
 
 struct LiftView: View {
+    
+    
+    
+    
     let auth = Auth.auth()
     let storage = Storage.storage()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -32,7 +36,41 @@ struct LiftView: View {
     
     func setInitialSelectedPlan() {
         if currentPlansViewModel.currentPlans.count > 1 {
-            selectedPlan = currentPlansViewModel.currentPlans[1].display
+            //selectedPlan = currentPlansViewModel.currentPlans[1].display
+            
+                let db = Firestore.firestore()
+                
+                // Reference to the subcollection
+                let subcollectionRef = db.collection("SelectedPlans").document("users").collection(authEmail)
+                
+                // Query to retrieve documents where 'fav' is equal to 'yes'
+                let query = subcollectionRef.whereField("fav", isEqualTo: "yes")
+                
+                query.getDocuments { (querySnapshot, error) in
+                    if let error = error {
+                        print("Error getting documents: \(error.localizedDescription)")
+                        return
+                    }
+                    
+                    guard let document = querySnapshot?.documents.first else {
+                        // No document with 'fav' equal to 'yes' found
+                        print("No document with 'fav' equal to 'yes' found in subcollection for \(authEmail)")
+                        return
+                    }
+                    
+                    // Print the document ID
+                    print("Document ID with 'fav' equal to 'yes' in subcollection for \(authEmail): \(document.documentID)")
+                    favName = document.documentID
+                    
+                    // Print the value of the "display" field
+                    if let displayValue = document.get("display") as? String {
+                        print("Display value: \(displayValue)")
+                        selectedPlan = displayValue
+                    } else {
+                        print("Display field not found or not a string.")
+                    }
+                }
+            
         } else {
             selectedPlan = "No Plans Added"
         }
@@ -79,18 +117,24 @@ struct LiftView: View {
         }
     }
 
-    @State private var selectedPlan: String = "" // Set default to "Plan 1"
-    let planOptions = ["Create New Plan"] + ["Plan 1", "Plan 2", "Plan 3", "Plan 4"]
+    @State public var selectedPlan: String = "" // Set default to "Plan 1"
+    @State public var favName: String = ""
+    @State public var selectedSplit: String = "temp" // Set default to "Plan 1"
+    let planOptions = ["Create New Plan"] + []
     @State private var documentIDs: [String] = []
     @State private var isExpanded = false
     @State private var isCreatingNewPlan = false
+    
+    
+    @State public var favSplit: String = "" // Set default to "Plan 1"
 
     func getDayType(for dayIndex: Int) {
+        print(selectedSplit)
         let adjustedDayIndex = (dayIndex + 7) % 7 // Adjusted index calculation
         let selectedDay = dayNames[adjustedDayIndex]
 
         let documentRef = db.collection("AllPlans")
-            .document("lucaPlan1")
+            .document(selectedSplit)
             .collection("Split")
             .document(selectedDay)
 
@@ -101,17 +145,87 @@ struct LiftView: View {
             }
 
             guard let document = document, document.exists else {
-                print("Document does not exist")
+                print("Document does not exisst")
+             
                 return
             }
 
             let data = document.data()
+            let test = data?["type"] as? String ?? ""
+            print(test)
             typeFromBD = data?["type"] as? String ?? ""
+            
         }
     }
 
     @State private var selectedExercise: Exercise? = nil
     
+    func printDocumentIDForFavorite() {
+        let db = Firestore.firestore()
+        
+        // Reference to the subcollection
+        let subcollectionRef = db.collection("SelectedPlans").document("users").collection(authEmail)
+        
+        // Query to retrieve documents where 'fav' is equal to 'yes'
+        let query = subcollectionRef.whereField("fav", isEqualTo: "yes")
+        
+        query.getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("Error getting documents: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let document = querySnapshot?.documents.first else {
+                // No document with 'fav' equal to 'yes' found
+                print("No document with 'fav' equal to 'yes' found in subcollection for \(authEmail)")
+                return
+            }
+            
+            // Print the document ID
+            print("Document ID with 'fav' equal to 'yes' in subcollection for \(authEmail): \(document.documentID)")
+            selectedSplit = document.documentID
+        }
+    }
+
+    
+    
+    
+    struct CoolHStackView: View {
+        @Binding var currentDay: Int
+        let dayNames: [String]
+        @ObservedObject var viewModel: ExerciseViewModel
+        let authEmail: String
+        let onTapGesture: () -> Void
+
+        var body: some View {
+            HStack(spacing: 5) {
+                ForEach(0..<7) { index in
+                    ZStack {
+                        Circle()
+                            .frame(width: 32.5, height: 32.5)
+                            .foregroundColor(index == currentDay ? CustomColor.limeColor : Color.white)
+                            .overlay(Circle().stroke(CustomColor.limeColor, lineWidth: 2))
+                            .onTapGesture {
+                                currentDay = index
+                                onTapGesture() // Call the onTapGesture closure
+                                
+                                
+                                //viewModel.getAllData(email: authEmail, day: dayNames[currentDay], selectedPlan: "YourSelectedPlanName")
+                            }
+
+                        Text(String(dayNames[index].prefix(1)))
+                            .font(.system(size: 15, weight: index == currentDay ? .bold : .regular))
+                            .foregroundColor(index == currentDay ? .white : CustomColor.limeColor)
+                    }
+
+                    if index < 6 {
+                        Line()
+                    }
+                }
+            }
+            .alignmentGuide(.leading) { d in d[.leading] }
+        }
+    }
 
     var body: some View {
         NavigationView {
@@ -133,29 +247,24 @@ struct LiftView: View {
                                         
                                         
                                     } else {
+                                        selectedSplit = plan.unique
                                         selectedPlan = plan.display
+                                        getDayType(for: currentDay)
+                                        print("here")
                                         isExpanded.toggle()
                                     }
                                 }) {
                                     HStack() {
                                         if plan.display != "Create New Plan" {
-                                            if plan.creator == Auth.auth().currentUser?.email {
-                                                NavigationLink(
-                                                  destination: PlanInfoView(unique: plan.unique)
-                                                 
-                                              ) {
-                                                  Image(systemName: "person.badge.key.fill")
-                                                      .foregroundColor(.black) .padding(.trailing)
-                                              }
-                                            } else {
+                                         
                                                   NavigationLink(
                                                     destination: PlanInfoView(unique: plan.unique)
                                                    
                                                 ) {
                                                     Image(systemName: "info.circle")
-                                                        .foregroundColor(.black) .padding(.trailing)
+                                                        .foregroundColor(.black)
                                                 }
-                                            }
+                                            
                                         }
 
                                         if plan.display == "Create New Plan" {
@@ -237,6 +346,15 @@ struct LiftView: View {
                                 .font(.system(size: 25, weight: .bold, design: .rounded))
                                 .foregroundColor(.black)
                                 .multilineTextAlignment(selectedPlan == "Create New Plan" ? .center : .leading)
+                            
+                            if !selectedPlan.isEmpty {
+                                if selectedSplit == favName {
+                                    Image(systemName: "heart.circle.fill")
+                                        .foregroundColor(CustomColor.limeColor)
+                                }
+                            }
+                            
+                            Spacer()
                         }
                     }
                 )
@@ -259,7 +377,7 @@ struct LiftView: View {
                                     .foregroundColor(exercise.name5 == "no" ? Color.primary : CustomColor.limeColor)
                                     .onTapGesture {
                                         // Handle swapping the box here
-                                        viewModel.swapBox(theID: String(exercise.name6), theCurrent: exercise.name5 ?? "", day: dayNames[currentDay])
+                                        viewModel.swapBox(theID: String(exercise.name6), theCurrent: exercise.name5 ?? "", day: dayNames[currentDay], selectedSplit: selectedSplit)
                                     }
 
                                 Text(exercise.name ?? "")
@@ -305,13 +423,15 @@ struct LiftView: View {
             }
             .onAppear {
                 updateCurrentDay()
+                printDocumentIDForFavorite()
                 currentPlansViewModel.fetchUserDocumentData()  // Make sure this is called
 
                 // Wait for a short duration to allow the data to be fetched
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     setInitialSelectedPlan()
                     getDayType(for: currentDay)
-                    viewModel.getAllData(email: authEmail, day: dayNames[currentDay])
+                    viewModel.getAllData(email: authEmail, day: dayNames[currentDay], selectedSplit: selectedSplit)
+
 
                     // Schedule a timer to check for the start of a new week every minute
                     Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { timer in
@@ -319,12 +439,25 @@ struct LiftView: View {
                     }
                 }
             }
-            .onChange(of: documentIDs) { _ in
+            .onChange(of: currentDay) { _ in
                 // Add a delay here as well
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    setInitialSelectedPlan()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.0) {
+                    //setInitialSelectedPlan()
                     getDayType(for: currentDay)
-                    viewModel.getAllData(email: authEmail, day: dayNames[currentDay])
+                    viewModel.getAllData(email: authEmail, day: dayNames[currentDay], selectedSplit: selectedSplit)
+
+                    // Schedule a timer to check for the start of a new week every minute
+                    Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { timer in
+                        checkForNewWeek()
+                    }
+                }
+            }
+            .onChange(of: selectedPlan) { _ in
+                // Add a delay here as well
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.0) {
+                    //setInitialSelectedPlan()
+                    getDayType(for: currentDay)
+                    viewModel.getAllData(email: authEmail, day: dayNames[currentDay], selectedSplit: selectedSplit)
 
                     // Schedule a timer to check for the start of a new week every minute
                     Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { timer in
@@ -337,40 +470,7 @@ struct LiftView: View {
     }
 }
 
-struct CoolHStackView: View {
-    @Binding var currentDay: Int
-    let dayNames: [String]
-    @ObservedObject var viewModel: ExerciseViewModel
-    let authEmail: String
-    let onTapGesture: () -> Void
 
-    var body: some View {
-        HStack(spacing: 5) {
-            ForEach(0..<7) { index in
-                ZStack {
-                    Circle()
-                        .frame(width: 32.5, height: 32.5)
-                        .foregroundColor(index == currentDay ? CustomColor.limeColor : Color.white)
-                        .overlay(Circle().stroke(CustomColor.limeColor, lineWidth: 2))
-                        .onTapGesture {
-                            currentDay = index
-                            onTapGesture() // Call the onTapGesture closure
-                            viewModel.getAllData(email: authEmail, day: dayNames[currentDay])
-                        }
-
-                    Text(String(dayNames[index].prefix(1)))
-                        .font(.system(size: 15, weight: index == currentDay ? .bold : .regular))
-                        .foregroundColor(index == currentDay ? .white : CustomColor.limeColor)
-                }
-
-                if index < 6 {
-                    Line()
-                }
-            }
-        }
-        .alignmentGuide(.leading) { d in d[.leading] }
-    }
-}
 
 struct Line: View {
     var body: some View {

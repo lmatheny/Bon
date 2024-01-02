@@ -136,6 +136,9 @@ struct CreatePlanView: View {
             guard !enteredTextAt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
                 // Display an error view with a message for a blank Plan ID
                 errorMessage = "Plan ID cannot be blank"
+                currentStep = 1
+                enteredCalories = ""
+                enteredTextAt = ""
                 showError = true
                 return
             }
@@ -143,6 +146,9 @@ struct CreatePlanView: View {
             guard !enteredTextName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
                 // Display an error view with a message for a blank Plan Name
                 errorMessage = "Plan Name cannot be blank"
+                currentStep = 1
+                enteredCalories = ""
+                enteredTextName = ""
                 showError = true
                 return
             }
@@ -168,7 +174,15 @@ struct CreatePlanView: View {
                         showError = true
                     } else {
                         // Document doesn't exist, create the plan
-                        plansCollection.document(enteredTextAt).setData([:]) { error in
+                        plansCollection.document(enteredTextAt).setData([
+                            "verified": "no",
+                            "creator": authEmail,
+                            "description": enteredTextDesc,
+                            "name": enteredTextName,
+                            "unique": enteredTextAt
+                        ])
+                        { error in
+                        //plansCollection.document(enteredTextAt).setData([:]) { error in
                             if error != nil {
                                 // Handle the error, e.g., show an error view
                                 errorMessage = "An error occurred while creating the plan. Please try again."
@@ -218,7 +232,8 @@ struct CreatePlanView: View {
                 "planDescription": enteredTextDesc,
                 "privacySelection": privacySelection,
                 "selectedCategory": selectedCategory,
-                "creator": authEmail // Add the creator field with the value of authEmail
+                "creator": authEmail,
+                "verified": "no"
             ]) { error in
                 if let error = error {
                     // Handle the error for the "Overview" subcollection

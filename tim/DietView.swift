@@ -48,6 +48,7 @@ struct DietView: View {
     @State private var presentAlert = false
     @State private var presentAlertAdd = false
     @State private var presentAlertEdit = false
+    @State private var presentAlertNew = false
     @State private var newFood: String = ""
     @State private var newCals: String = ""
     @State private var editFood: String = ""
@@ -56,7 +57,6 @@ struct DietView: View {
   
     var favArray: [String] = []
     @State private var tempFavStr: String = ""
-    
     @State private var editStr: String = ""
     private var db = Firestore.firestore()
     
@@ -1027,7 +1027,11 @@ struct DietView: View {
                                             
                                             Spacer()
                                             
-                                            Image(systemName: "plus.circle") .foregroundColor(CustomColor.limeColor) .onTapGesture { newFoodEntryFromFav(favName: element)}
+                                            Image(systemName: "plus.circle") .foregroundColor(CustomColor.limeColor) .onTapGesture {
+
+                                                newFoodEntryFromFav(favName: element)
+                                                searchText = ""
+                                            }
                                             
                                             
                                         }
@@ -1144,10 +1148,38 @@ struct DietView: View {
                     
                     
                     Button(action: {
-                        updateStreak()
+                        presentAlertNew = true
+                       
                         }) {
                             Image(systemName: "calendar.badge.plus")
-                        }.frame(width: 50, height: 50)
+                        }.alert(isPresented: $presentAlertNew) {
+                            Alert(
+                                title: Text("Start New Day"),
+                                message: Text("Are you sure you want to start a fresh day?"),
+                                primaryButton: .destructive(Text("Confirm")) {
+                                  
+                                 
+                                    updateStreak()
+                                    presentAlertNew = false
+                                },
+                                secondaryButton: .cancel() {
+                                    presentAlertNew = false
+                                }
+                            )
+                        }
+                        
+                        
+                        
+//
+//                        .alert("Start New Day?", isPresented: $presentAlertNew, actions: {
+//                            message: Text("Are you sure you want to delete this plan?"),
+//
+//                            Button("Confirm", action: {updateStreak()})
+//                            Button("Cancel", role: .cancel, action: {})
+//                        })
+                        
+                        
+                        .frame(width: 50, height: 50)
                             .foregroundColor(.white)
                             .background(Color.blue)
                         .clipShape(Circle()).background(Color.blue)

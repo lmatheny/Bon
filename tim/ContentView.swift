@@ -94,7 +94,7 @@ class AppViewModel: ObservableObject {
                                     Label("", systemImage: "fork.knife")
                                 }
 
-                            HistoryView()
+                           AccountView()
                                 .tabItem {
                                     Label("", systemImage: "figure.wave")
                                 }

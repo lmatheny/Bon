@@ -16,18 +16,18 @@ class ExerciseViewModel: ObservableObject {
     @State public var emailStr = ""
     
     @Published var exercises = [Exercise]()
-    @Published var typeFromBD: String = "hi"
+    @Published var typeFromBD: String = "test"
     @Published var selectedExercise: Exercise? = nil
     private var db = Firestore.firestore()
     
     
 
 
-    func swapBox(theID: String, theCurrent: String, day: String) {
+    func swapBox(theID: String, theCurrent: String, day: String, selectedSplit: String) {
             let newValue = theCurrent == "yes" ? "no" : "yes"
 
             let documentRef = db.collection("AllPlans")
-                .document("lucaPlan1")
+                .document(selectedSplit)
                 .collection("Split")
                 .document(day)
                 .collection("theWorkout")
@@ -43,9 +43,14 @@ class ExerciseViewModel: ObservableObject {
         }
     
     
-    func getAllData(email: String, day: String) {
+    func getAllData(email: String, day: String, selectedSplit: String) {
+        
+        if(selectedSplit == "") {
+            print("here")
+        }
+        
         db.collection("AllPlans")
-            .document("lucaPlan1")
+            .document(selectedSplit)
             .collection("Split")
             .document(day)
             .collection("theWorkout")
