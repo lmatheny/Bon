@@ -239,8 +239,10 @@ struct LiftView: View {
                 DisclosureGroup(
                     isExpanded: $isExpanded,
                     content: {
+                        
                         VStack(alignment: .leading) {
-                            ForEach(currentPlansViewModel.currentPlans, id: \.unique) { plan in
+                            
+                            ForEach(currentPlansViewModel.currentPlans, id: \.display) { plan in
                                 Button(action: {
                                     if plan.display == "Create New Plan" {
                                        // isCreatingNewPlan = true
@@ -249,7 +251,6 @@ struct LiftView: View {
                                     } else {
                                         selectedSplit = plan.unique
                                         selectedPlan = plan.display
-                                        getDayType(for: currentDay)
                                         print("here")
                                         isExpanded.toggle()
                                     }
@@ -258,10 +259,10 @@ struct LiftView: View {
                                         if plan.display != "Create New Plan" {
                                          
                                                   NavigationLink(
-                                                    destination: PlanInfoView(unique: plan.unique)
+                                                    destination: PlanInfoView(unique: plan.unique, verified: "no")
                                                    
                                                 ) {
-                                                    Image(systemName: "info.circle")
+                                                    Image(systemName: "info.square")
                                                         .foregroundColor(.black)
                                                 }
                                             
@@ -457,6 +458,7 @@ struct LiftView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.0) {
                     //setInitialSelectedPlan()
                     getDayType(for: currentDay)
+                   
                     viewModel.getAllData(email: authEmail, day: dayNames[currentDay], selectedSplit: selectedSplit)
 
                     // Schedule a timer to check for the start of a new week every minute
@@ -485,4 +487,3 @@ struct LiftView_Previews: PreviewProvider {
         LiftView()
     }
 }
-

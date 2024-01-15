@@ -13,7 +13,7 @@ import FirebaseAuth
 class PlanViewdModel: ObservableObject {
     
     let auth = Auth.auth()
-    let authEmail = Auth.auth().currentUser?.email
+    let authEmail = "" + (Auth.auth().currentUser?.email ?? "")
     @State public var emailStr = ""
     
     @Published var plans = [Plan]()

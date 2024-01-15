@@ -45,10 +45,6 @@ class ExerciseViewModel: ObservableObject {
     
     func getAllData(email: String, day: String, selectedSplit: String) {
         
-        if(selectedSplit == "") {
-            print("here")
-        }
-        
         db.collection("AllPlans")
             .document(selectedSplit)
             .collection("Split")
@@ -70,7 +66,9 @@ class ExerciseViewModel: ObservableObject {
                     let name8 = data["notes"] as? String ?? ""
                     let name9 = data["recReps"] as? String ?? ""
                     let name10 = data["recSets"] as? String ?? ""
-                    let planName = "lucaPlan1"
+                    let planName = data["id"] as? String ?? ""
+                    print("doing" + selectedSplit)
+                    print("one:" + name)
                     return Exercise(name: name, name2: name2, name4: name4, name5: name5, name6: name6, name7: name7, name8: name8, name9: name9, name10: name10, plan: planName)
                 }
             }

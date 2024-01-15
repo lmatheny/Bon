@@ -40,9 +40,50 @@ struct RemoteImage: View {
         let storage = Storage.storage()
         let storageRef = storage.reference(forURL: storagePath)
 
-        storageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
+        storageRef.getData(maxSize: 1 * 10024 * 10024) { data, error in
             if let error = error {
                 print("Error downloading image: \(error.localizedDescription)")
+            } else if let data = data, let uiImage = UIImage(data: data) {
+                self.image = Image(uiImage: uiImage)
+            }
+        }
+    }
+}
+
+struct RemoteImage2: View {
+    @State private var image: Image?
+    let storagePath: String
+    let labelText = "Bon's Fatburn" // Hardcoded label
+
+    init(_ storagePath: String) {
+        self.storagePath = storagePath
+    }
+
+    var body: some View {
+        VStack {
+            if let image = image {
+                image
+                    .resizable()
+                    .frame(width: 50, height: 50) // Adjust the size as needed
+                    .clipShape(Circle())
+             
+            } else {
+                ProgressView().frame(height: 45) // Adjust the size as needed
+                    .onAppear {
+                        downloadImage()
+                    }
+            }
+        }
+    }
+
+    private func downloadImage() {
+        let storage = Storage.storage()
+        let storageRef = storage.reference(forURL: storagePath)
+
+        storageRef.getData(maxSize: 1 * 10024 * 10024) { data, error in
+            if let error = error {
+                print("Error downloading image: \(error.localizedDescription)")
+                self.image = Image("def")
             } else if let data = data, let uiImage = UIImage(data: data) {
                 self.image = Image(uiImage: uiImage)
             }
@@ -95,17 +136,16 @@ struct NewPlanView: View {
                         
                         HStack(spacing: 27.5) {
                             
-                            NavigationLink(destination: InfoPlan(element0: "lucaPlan1")) {
+                            NavigationLink(destination: PlanInfoView(unique: "lucaPlan1", verified: "yes")) {
                                 
                                 RemoteImage("gs://tfinal-a07fc.appspot.com/luke.png")
                             }
                             
-                            NavigationLink(destination: InfoPlan(element0: "lucaPlan1")) {
+                            NavigationLink(destination: PlanInfoView(unique: "lucaPlan1", verified: "yes")) {
                                 
                                 RemoteImage("gs://tfinal-a07fc.appspot.com/luke.png")
                             }
-                            
-                            NavigationLink(destination: InfoPlan(element0: "lucaPlan1")) {
+                            NavigationLink(destination: PlanInfoView(unique: "lucaPlan1", verified: "yes")) {
                                 
                                 RemoteImage("gs://tfinal-a07fc.appspot.com/luke.png")
                             }
@@ -124,7 +164,7 @@ struct NewPlanView: View {
                     HStack {
                         HStack {
                             Image(systemName: "magnifyingglass")
-                            TextField("Quick add from favorites", text: $searchText, onEditingChanged: { isEditing in
+                            TextField("Search for a plan", text: $searchText, onEditingChanged: { isEditing in
                                 self.showCancelButton = true
                                 viewModel2.addElement(emailVal: authEmail, userSearch: searchText)
                             }, onCommit: {
@@ -167,23 +207,45 @@ struct NewPlanView: View {
                     NavigationView {
                         VStack{
                             List(viewModel2.elementsArray, id: \.0) { element in
-                                NavigationLink(destination: InfoPlan(element0: element.0)) {
-                                    VStack {
+                                NavigationLink(destination: PlanInfoView(unique: element.0, verified: element.1)) {
+                                        
+                                        
                                         HStack {
-                                            Text(element.0)
                                             
-                                            if element.1.lowercased() == "yes" {
-                                                Image(systemName: "checkmark.seal.fill")
-                                                    .foregroundColor(CustomColor.limeColor)
-                                                    .imageScale(.small)
-                                            } else if element.1.lowercased() != "no" {
-                                                Text(element.1)
+                                            RemoteImage2("gs://tfinal-a07fc.appspot.com/planPics/\(element.0).jpg").padding(.trailing)
+                                            
+                                            VStack(alignment: .leading) {
+                                                
+                                                Spacer()
+                                                
+                                                HStack {
+                                                    
+                                                    Text(element.0)
+                                                        .font(.system(size: 20, weight: .bold))
+                                                        .multilineTextAlignment(.leading)
+                                                    
+                                                    if element.1.lowercased() == "yes" {
+                                                        Image(systemName: "checkmark.seal.fill")
+                                                            .foregroundColor(CustomColor.limeColor)
+                                                            .imageScale(.small)
+                                                    } else if element.1.lowercased() != "no" {
+                                                        // Handle the case when element.1 is neither "yes" nor "no"
+                                                    }
+                                                    Spacer()
+                                                }
+
+                                                Text(element.2)
+                                                    .font(.system(size: 17.5))
+                                                    .multilineTextAlignment(.leading)
+
+                                                Spacer()
                                             }
+
                                             
                                             Spacer()
                                         }
-                                        Text(element.2)
-                                    }
+                                       
+
                                 }
                             }.alert(isPresented: $showConfirmationAlert) {
                                 Alert(
@@ -195,7 +257,7 @@ struct NewPlanView: View {
                                     }
                                 )}
                             .listStyle(PlainListStyle())
-                            .padding(.horizontal)
+                         
                         }
                     }
                 }
@@ -301,7 +363,8 @@ struct InfoPlan: View {
     var body: some View {
             VStack {
                 // Use the passed value in this view
-                Text("Info for: \(element0)")
+                //RemoteImage2("gs://tfinal-a07fc.appspot.com/planPics/\().jpg").padding(.trailing)
+                Spacer()
 
                 Spacer()
 

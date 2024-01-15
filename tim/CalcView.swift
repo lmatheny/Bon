@@ -536,10 +536,11 @@ struct CalcView_Previews: PreviewProvider {
 struct MyTextFieldStyle: TextFieldStyle {
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
-            .padding(12.5)
+            .padding(15)
         .background(
             RoundedRectangle(cornerRadius: 15, style: .continuous)
                 .stroke(Color.cyan, lineWidth: 3)
+                
         )
     }
 }

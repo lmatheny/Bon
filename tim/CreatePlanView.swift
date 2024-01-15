@@ -1,6 +1,8 @@
 import SwiftUI
 import Firebase
 import FirebaseAuth
+import FirebaseStorage
+
 
 struct CreatePlanView: View {
     
@@ -23,6 +25,7 @@ struct CreatePlanView: View {
     struct StepContentView: View {
         @State private var isConfirmationAlertPresented = false
         @State private var showSuccessMessage = false
+        @State private var picChosen = false
         @Environment(\.presentationMode) var presentationMode
         let authEmail = "" + (Auth.auth().currentUser?.email ?? "")
        
@@ -123,6 +126,9 @@ struct CreatePlanView: View {
         @State private var errorMessage = ""
         @State private var tempCals = ""
         
+        @State private var selectedImage: UIImage?
+        @State private var isImagePickerPresented: Bool = false
+        
         
         // Function to handle plan creation logic
         // Function to handle plan creation logic
@@ -207,6 +213,54 @@ struct CreatePlanView: View {
                 }
             }
         }
+        
+        
+        
+        
+        func uploadImageToFirebaseStorage(selectedImage: UIImage) {
+            // Get a reference to the root storage directory
+            let storageRef = Storage.storage().reference()
+
+            // Specify the folder path (e.g., "images/")
+            let folderPath = "planPics/"
+
+            // Use a fixed name for the image within the folder (e.g., "test.jpg")
+            let imageName = "\(folderPath)\(enteredTextAt).jpg"
+            let imageRef = storageRef.child(imageName)
+
+            // Convert the UIImage to Data
+            if let imageData = selectedImage.jpegData(compressionQuality: 0.5) {
+                // Upload the data to Firebase Storage
+                let uploadTask = imageRef.putData(imageData, metadata: nil) { (metadata, error) in
+                    if let error = error {
+                        print("Error uploading image to Firebase Storage: \(error.localizedDescription)")
+                    } else {
+                        // Image uploaded successfully
+                        print("Image uploaded to Firebase Storage")
+
+                        // You can also get the download URL if needed
+                        imageRef.downloadURL { (url, error) in
+                            if let downloadURL = url {
+                                print("Download URL: \(downloadURL)")
+                                // Now you can use the download URL as needed (e.g., store it in your database)
+                            } else if let error = error {
+                                print("Error getting download URL: \(error.localizedDescription)")
+                            }
+                        }
+                    }
+                }
+
+                // You can use the uploadTask to observe the progress or perform additional actions if needed
+                // uploadTask.observe(.progress) { snapshot in
+                //     let percentComplete = 100.0 * Double(snapshot.progress!.completedUnitCount) / Double(snapshot.progress!.totalUnitCount)
+                //     print("Upload progress: \(percentComplete)%")
+                // }
+
+                // Uncomment the above lines if you want to observe the upload progress
+            }
+        }
+
+
 
 
         func createDietCollection(for planDocument: DocumentReference) {
@@ -314,139 +368,118 @@ struct CreatePlanView: View {
         // Use a state variable to track the selected day
         @State private var selectedDayIndex = 0
         var body: some View {
+          
             VStack {
                 switch currentStep {
                 case 1:
                     // Text fields for plan details
                     
+                    VStack {
                     Text("Plan Overview")
                         .font(.system(size: 37.5, weight: .bold, design: .rounded))
-                           .bold()
+                        .bold()
+                    
+                    
+              
+                        // Add plan thumbnail pic
+                        Button(action: {
+                           
+                            isImagePickerPresented.toggle()
+                          
+                        }) {
+                            ZStack {
+                                if let selectedImage = selectedImage {
+                                    Image(uiImage: selectedImage)
+                                        .resizable()
+                                        .scaledToFill() // Use scaledToFill to maintain aspect ratio and fill the frame
+                                        .frame(width: 175, height: 175) // Adjust the size as needed
+                                        .clipped() // Ensure the image doesn't exceed the frame boundaries
+                                  
+                                   
+                                } else {
+                                    Rectangle()
+                                        .fill(Color.gray.opacity(0.3))
+                                        .frame(width: 175, height: 175) // Adjust the size as needed
+                                        .overlay(
+                                            Image(systemName: "plus")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .foregroundColor(.white)
+                                                .frame(width: 20, height: 20)
+                                        )
+                                }
+                            }
+
+                        }
+                        .sheet(isPresented: $isImagePickerPresented) {
+                            ImagePickerView(selectedImage: $selectedImage, isImagePickerPresented: $isImagePickerPresented)
+                    
+                        }
+                      
+                        Text(selectedImage == nil ? "Add a cover picture" : "Change cover picture").foregroundColor(.gray)
                     
                     
                     TextField("Enter a plan title", text: $enteredTextName)
                         .textFieldStyle(MyTextFieldStyle())
-                        .padding(.bottom)
+                        .padding(.top,2.5)
+                        .padding(.bottom,15)
+                        .padding(.leading, 2.5)
+                        .padding(.trailing, 2.5)
+
+                    
+                        
+                        
                     TextField("Create a unique plan ID", text: $enteredTextAt)
                         .textFieldStyle(MyTextFieldStyle())
-                        .padding(.bottom)
+                        .padding(.leading, 2.5)
+                        .padding(.trailing, 2.5)
                         .disableAutocorrection(true) // Disable autocorrection
-                    TextField("Enter a plan description", text: $enteredTextDesc)
-                        .textFieldStyle(MyTextFieldStyle()).padding(.bottom,5)
-                      
-                      
                     
                     
-    //                Text("Privacy Settings")
-    //                    .font(.system(size: 27.5, weight: .bold, design: .rounded))
-    //                    .padding(.bottom, 2.5)
-    //                    .bold().foregroundColor(CustomColor.limeColor)
-    //
                     
-    //                HStack {
-    //                    Button(action: {
-    //                        // Handle action for the first button
-    //                        if isPublic != false {
-    //                            isPublic.toggle()
-    //                        }
-    //                    }) {
-    //                        Text("Private")
-    //                            .padding()
-    //                            .foregroundColor(.white)
-    //                            .background(isPublic ? Color.gray : Color.cyan)
-    //                            .cornerRadius(4)
-    //                    }
-    //
-    //                    Button(action: {
-    //                        // Handle action for the second button
-    //                        if isPublic == false {
-    //                            isPublic.toggle()
-    //                        }
-    //                    }) {
-    //                        Text("Public")
-    //                            .padding()
-    //                            .foregroundColor(.white)
-    //                            .background(isPublic ? Color.cyan : Color.gray)
-    //                            .cornerRadius(4)
-    //                    }
-    //                }
+                    Spacer()
                     
-                    VStack {
-                        
-                        Text("Privacy Settings")
-                            .font(.system(size: 20))
-                            .bold()
-                            .foregroundColor(.black).padding(.top, 5)
+                    
                    
-                        
-                        Picker("Privacy Settings", selection: $privacySelection) {
-                            Text("Private").tag("Private")
-                            Text("Public").tag("Public")
-                        }
-                        .pickerStyle(SegmentedPickerStyle())
-                        .padding(.leading)
-                        .padding(.trailing)
-                        
-                    
-                    }
-                    VStack {
-                               Button(action: {
-                                   isSheetPresented.toggle()
-                               }) {
-                                   HStack {
-                                   
-                                       Text("Add a Plan Category")
-                                           .font(.system(size: 25, weight: .bold, design: .rounded)).padding(.bottom, 2.5)
-            
-                                       
-                                       Image(systemName: "plus.circle")
-                                           .foregroundColor(CustomColor.limeColor).bold()
-                                   }
-                                   
-                                      
-                               }
-                        Text("Selected Category: \(selectedCategory)").font(.system(size: 15)).onTapGesture {
-                            isSheetPresented.toggle()
-                        }
-                                   
-                    }
-                    
-                    
-                    .sheet(isPresented: $isSheetPresented) {
-                        NavigationView {
-                            ScrollView {
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 20) {
-                                    ForEach(Categories, id: \.0) { category in
-                                        Button(action: {
-                                            selectedCategory = category.0
-                                            isSheetPresented.toggle()
-                                        }) {
-                                            VStack {
-                                                Text(category.1) // Emoji
-                                                    .font(.largeTitle)
-                                                Text(category.0) // Category Name
-                                                    .font(.headline)
-                                                    .foregroundColor(.white)
-                                            }
-                                            .frame(maxWidth: .infinity)
-                                            .padding()
-                                            .background(.cyan)
-                                            .cornerRadius(10)
-                                        }
-                                        .buttonStyle(PlainButtonStyle())
-                                    }
+                        HStack {
+                            // Previous button
+                            Button(action: {
+                                if currentStep > 1 {
+                                    currentStep -= 1
                                 }
-                                .padding()
+                            }) {
+                                Image(systemName: "arrow.left.circle.fill")
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(CustomColor.limeColor)
+                                    .cornerRadius(8)
                             }
-                            .navigationTitle("Select Category").bold()
-                            .navigationBarItems(trailing: Button("Cancel") {
-                                isSheetPresented.toggle()
-                            })
+                            .padding()
+                            Spacer()
+                            // Button symbol
+                            let buttonSymbol = currentStep == 4 ? "checkmark.circle.fill" : "arrow.right.circle.fill"
+                            // Next button
+                            Button(action: {
+                                if currentStep < 4 {
+                                    currentStep += 1
+                                } else {
+                                    // Show the confirmation alert only on the fourth step
+                                    isConfirmationAlertPresented = true
+                                }
+                            }) {
+                                Image(systemName: buttonSymbol)
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(CustomColor.limeColor)
+                                    .cornerRadius(8)
+                            }
+                            .padding()
                         }
-                    }
-                    .padding()
-                    // ...
-                    // Inside StepContentView for Case 2
+                }
                 case 2:
                     Text("Workout Split")
                         .font(.system(size: 37.5, weight: .bold, design: .rounded))
@@ -460,7 +493,7 @@ struct CreatePlanView: View {
                     
                     
                     HStack {
-                        Text("What kind of workout is this?")
+                        Text("What kind of workout is this day?")
                             .padding(.top)
                             .font(.system(size: 20))
                             .foregroundColor(.black)
@@ -492,7 +525,7 @@ struct CreatePlanView: View {
                             Button("Add", action: { addWorkout() })
                             Button("Cancel", role: .cancel, action: { isAddingWorkoutAlertPresented = false })
                         })
-                    }.padding(.top)
+                    }.padding(.top, 3)
                     
                     
                     // Add a placeholder if the list is empty
@@ -517,10 +550,51 @@ struct CreatePlanView: View {
                             .onDelete(perform: deleteWorkout) // Enable swipe to delete and edit button for each row
                         }
                     }
-                  
+                    
                     Spacer()
+                    HStack {
+                        // Previous button
+                        Button(action: {
+                            if currentStep > 1 {
+                                currentStep -= 1
+                            }
+                        }) {
+                            Image(systemName: "arrow.left.circle.fill")
+                                .resizable()
+                                .frame(width: 30, height: 30)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(CustomColor.limeColor)
+                                .cornerRadius(8)
+                        }
+                        .padding()
+                        Spacer()
+                        // Button symbol
+                        let buttonSymbol = currentStep == 4 ? "checkmark.circle.fill" : "arrow.right.circle.fill"
+                        // Next button
+                        Button(action: {
+                            if currentStep < 4 {
+                                currentStep += 1
+                            } else {
+                                // Show the confirmation alert only on the fourth step
+                                isConfirmationAlertPresented = true
+                            }
+                        }) {
+                            Image(systemName: buttonSymbol)
+                                .resizable()
+                                .frame(width: 30, height: 30)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(CustomColor.limeColor)
+                                .cornerRadius(8)
+                        }
+                        .padding()
+                    }
+                  
+                    
+                  
                 case 3:
-                    VStack() {
+            
                         Text("Dietary Strategy")
                             .font(.system(size: 37.5, weight: .bold, design: .rounded))
                             .bold()
@@ -586,9 +660,199 @@ struct CreatePlanView: View {
                             .background(Color.cyan)
                             .cornerRadius(25)
                         }
-                    }
                     
                     Spacer()
+
+                    
+                    HStack {
+                        // Previous button
+                        Button(action: {
+                            if currentStep > 1 {
+                                currentStep -= 1
+                            }
+                        }) {
+                            Image(systemName: "arrow.left.circle.fill")
+                                .resizable()
+                                .frame(width: 30, height: 30)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(CustomColor.limeColor)
+                                .cornerRadius(8)
+                        }
+                        .padding()
+                        Spacer()
+                        // Button symbol
+                        let buttonSymbol = currentStep == 4 ? "checkmark.circle.fill" : "arrow.right.circle.fill"
+                        // Next button
+                        Button(action: {
+                            if currentStep < 4 {
+                                currentStep += 1
+                            } else {
+                                // Show the confirmation alert only on the fourth step
+                                isConfirmationAlertPresented = true
+                            }
+                        }) {
+                            Image(systemName: buttonSymbol)
+                                .resizable()
+                                .frame(width: 30, height: 30)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(CustomColor.limeColor)
+                                .cornerRadius(8)
+                        }
+                        .padding()
+                    }
+                  
+                case 4:
+                    Text("Optional Settings")
+                        .font(.system(size: 37.5, weight: .bold, design: .rounded))
+                        .bold()
+                    
+                    
+//                    TextField("Enter a plan description", text: $enteredTextDesc)
+//                        .textFieldStyle(MyTextFieldStyle())
+//                        .padding(.bottom,5)
+//                        .padding(.leading, 2.5)
+//                        .padding(.trailing, 2.5)
+                    
+                    
+                    VStack {
+                        HStack {
+                            Text("Add a brief plan description")
+                                .font(.system(size: 20))
+                                .foregroundColor(.black)
+                                .bold()
+                           
+                        }.padding(.top,2)
+
+                        // Use TextEditor for multiline input
+                        TextEditor(text: $enteredTextDesc)
+                            .frame(height: 100)
+                            .padding(.vertical, 8)
+                            .background(RoundedRectangle(cornerRadius: 8).fill(Color.white))
+                            .shadow(color: Color.gray.opacity(0.1), radius: 4, x: 0, y: 1)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray, lineWidth: 1)
+                            )
+                        
+                    }
+                            
+                    
+                    VStack {
+                        
+                        Text("Privacy Settings")
+                            .font(.system(size: 20))
+                            .bold()
+                            .foregroundColor(.black).padding(.top, 5)
+                        
+                        
+                        Picker("Privacy Settings", selection: $privacySelection) {
+                            Text("Private").tag("Private")
+                            Text("Public").tag("Public")
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        .padding(.leading)
+                        .padding(.trailing)
+                        .padding(.bottom)
+                        
+                        VStack {
+                            Button(action: {
+                                isSheetPresented.toggle()
+                            }) {
+                                HStack {
+                                    
+                                    Text("Add a Plan Category")
+                                        .font(.system(size: 25, weight: .bold, design: .rounded)).padding(.bottom, 2.5)
+                                    
+                                    
+                                    Image(systemName: "plus.circle")
+                                        .foregroundColor(CustomColor.limeColor).bold()
+                                }
+                                
+                                
+                            }
+                            Text("Selected Category: \(selectedCategory)").font(.system(size: 15)).onTapGesture {
+                                isSheetPresented.toggle()
+                            }
+                            
+                        }
+                        
+                        
+                        .sheet(isPresented: $isSheetPresented) {
+                            NavigationView {
+                                ScrollView {
+                                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 20) {
+                                        ForEach(Categories, id: \.0) { category in
+                                            Button(action: {
+                                                selectedCategory = category.0
+                                                isSheetPresented.toggle()
+                                            }) {
+                                                VStack {
+                                                    Text(category.1) // Emoji
+                                                        .font(.largeTitle)
+                                                    Text(category.0) // Category Name
+                                                        .font(.headline)
+                                                        .foregroundColor(.white)
+                                                }
+                                                .frame(maxWidth: .infinity)
+                                                .padding()
+                                                .background(.cyan)
+                                                .cornerRadius(10)
+                                            }
+                                            .buttonStyle(PlainButtonStyle())
+                                        }
+                                    }
+                                    .padding()
+                                }
+                                .navigationTitle("Select Category").bold()
+                                .navigationBarItems(trailing: Button("Cancel") {
+                                    isSheetPresented.toggle()
+                                })
+                            }
+                            
+                        }
+                        Spacer()
+                        
+                        HStack {
+                            // Previous button
+                            Button(action: {
+                                if currentStep > 1 {
+                                    currentStep -= 1
+                                }
+                            }) {
+                                Image(systemName: "arrow.left.circle.fill")
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(CustomColor.limeColor)
+                                    .cornerRadius(8)
+                            }
+                            .padding()
+                            Spacer()
+                            // Button symbol
+                            let buttonSymbol = currentStep == 4 ? "checkmark.circle.fill" : "arrow.right.circle.fill"
+                            // Next button
+                            Button(action: {
+                                if currentStep < 4 {
+                                    currentStep += 1
+                                } else {
+                                    // Show the confirmation alert only on the fourth step
+                                    isConfirmationAlertPresented = true
+                                }
+                            }) {
+                                Image(systemName: buttonSymbol)
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(CustomColor.limeColor)
+                                    .cornerRadius(8)
+                            }
+                            .padding()
+                        }
+                    }
                     
                 default:
                     EmptyView()
@@ -611,52 +875,61 @@ struct CreatePlanView: View {
             }
             
             
-            HStack {
-                // Previous button
-                Button(action: {
-                    if currentStep > 1 {
-                        currentStep -= 1
-                    }
-                }) {
-                    Image(systemName: "arrow.left.circle.fill")
-                        .resizable()
-                        .frame(width: 30, height: 30)
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(CustomColor.limeColor)
-                        .cornerRadius(8)
-                }
-                .padding()
-                Spacer()
-                // Button symbol
-                let buttonSymbol = currentStep == 3 ? "checkmark.circle.fill" : "arrow.right.circle.fill"
-                // Next button
-                Button(action: {
-                    if currentStep < 3 {
-                        currentStep += 1
-                    } else {
-                        // Show the confirmation alert only on the fourth step
-                        isConfirmationAlertPresented = true
-                    }
-                }) {
-                    Image(systemName: buttonSymbol)
-                        .resizable()
-                        .frame(width: 30, height: 30)
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(CustomColor.limeColor)
-                        .cornerRadius(8)
-                }
-                .padding()
-            }
+//            HStack {
+//                // Previous button
+//                Button(action: {
+//                    if currentStep > 1 {
+//                        currentStep -= 1
+//                    }
+//                }) {
+//                    Image(systemName: "arrow.left.circle.fill")
+//                        .resizable()
+//                        .frame(width: 30, height: 30)
+//                        .foregroundColor(.white)
+//                        .padding()
+//                        .background(CustomColor.limeColor)
+//                        .cornerRadius(8)
+//                }
+//                .padding()
+//                Spacer()
+//                // Button symbol
+//                let buttonSymbol = currentStep == 3 ? "checkmark.circle.fill" : "arrow.right.circle.fill"
+//                // Next button
+//                Button(action: {
+//                    if currentStep < 3 {
+//                        currentStep += 1
+//                    } else {
+//                        // Show the confirmation alert only on the fourth step
+//                        isConfirmationAlertPresented = true
+//                    }
+//                }) {
+//                    Image(systemName: buttonSymbol)
+//                        .resizable()
+//                        .frame(width: 30, height: 30)
+//                        .foregroundColor(.white)
+//                        .padding()
+//                        .background(CustomColor.limeColor)
+//                        .cornerRadius(8)
+//                }
+//                .padding()
+//            }
             // Page indicator
-            HStack(spacing: 10) {
-                ForEach(1..<4) { step in
-                    Circle()
-                        .fill(step <= currentStep ? CustomColor.limeColor : Color.gray)
-                        .frame(width: 15, height: 15)
+            HStack {
+                Spacer()
+                
+                HStack(spacing: 10) {
+                    ForEach(1..<5) { step in
+                        Circle()
+                            .fill(step <= currentStep ? CustomColor.limeColor : Color.gray)
+                            .frame(width: 15, height: 15)
+                    }
                 }
+               
+                Spacer()
             }
+           
+
+
             
             
             .alert(isPresented: $isConfirmationAlertPresented) {
@@ -666,11 +939,17 @@ struct CreatePlanView: View {
                     primaryButton: .default(Text("Yes!")) {
                         // Implement logic to navigate back to LiftView
                         addPlan()
+                        if let unwrappedImage = selectedImage {
+                            uploadImageToFirebaseStorage(selectedImage: unwrappedImage)
+                        } else {
+                            // Handle the case when selectedImage is nil (optional is not set)
+                            print("Error: No image selected.")
+                        }
+
                     },
                     secondaryButton: .cancel()
                 )
             }
-            .padding(.bottom)
         }
     }
 }
@@ -793,3 +1072,42 @@ struct LineBlue: View {
 }
 
 
+
+
+struct ImagePickerView: UIViewControllerRepresentable {
+    @Binding var selectedImage: UIImage?
+    @Binding var isImagePickerPresented: Bool
+
+    func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePickerView>) -> UIImagePickerController {
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = context.coordinator
+        imagePickerController.sourceType = .photoLibrary
+        return imagePickerController
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: UIViewControllerRepresentableContext<ImagePickerView>) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        let parent: ImagePickerView
+
+        init(parent: ImagePickerView) {
+            self.parent = parent
+        }
+
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+            if let uiImage = info[.originalImage] as? UIImage {
+                parent.selectedImage = uiImage
+            }
+
+            parent.isImagePickerPresented = false
+        }
+
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.isImagePickerPresented = false
+        }
+    }
+}

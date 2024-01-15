@@ -4,6 +4,8 @@ import FirebaseFirestore
 
 class CurrentPlansViewModel: ObservableObject {
     @Published var currentPlans: [CurrentPlans] = []
+    let auth = Auth.auth()
+    let authEmail = "" + (Auth.auth().currentUser?.email ?? "")
 
     private var db = Firestore.firestore()
 
@@ -16,7 +18,12 @@ class CurrentPlansViewModel: ObservableObject {
         db.collection("SelectedPlans")
             .document("users")
             .collection(currentUserEmail)
-            .addSnapshotListener { (querySnapshot, error) in
+            .getDocuments { (querySnapshot, error) in
+                if let error = error {
+                    print("Error getting documents: \(error)")
+                    return
+                }
+
                 guard let documents = querySnapshot?.documents else {
                     print("No documents")
                     return
@@ -25,10 +32,6 @@ class CurrentPlansViewModel: ObservableObject {
                 // Ensure "Create New Plan" is the first element in the array
                 self.currentPlans = [CurrentPlans(display: "Create New Plan", unique: "test", creator: "test", fav: "test")]
 
-                // Separate plans with fav "yes" and "no"
-                var favYesPlans: [CurrentPlans] = []
-                var favNoPlans: [CurrentPlans] = []
-
                 for document in documents {
                     let data = document.data()
                     let display = data["display"] as? String ?? ""
@@ -36,18 +39,16 @@ class CurrentPlansViewModel: ObservableObject {
                     let creator = data["creator"] as? String ?? ""
                     let fav = data["fav"] as? String ?? ""
 
+                    print("here: \(display), \(unique), \(creator), \(fav)")
+                    
                     let plan = CurrentPlans(display: display, unique: unique, creator: creator, fav: fav)
-
-                    if fav == "yes" {
-                        favYesPlans.append(plan)
-                    } else {
-                        favNoPlans.append(plan)
-                    }
+                    self.currentPlans.append(plan)
                 }
 
-                // Concatenate the arrays, putting fav "yes" plans at index 1
-                self.currentPlans += favYesPlans + favNoPlans
+                // Print plans for debugging
+                print("Current Plans: \(self.currentPlans)")
             }
     }
+
 }
 
