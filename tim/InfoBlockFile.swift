@@ -10,7 +10,7 @@ import Firebase
 import FirebaseStorage
 import FirebaseAuth
 
-struct PlanInfoView: View {
+struct BlockInfoFile: View {
     let unique: String
     let verified: String
     @State private var name: String = ""
@@ -29,8 +29,28 @@ struct PlanInfoView: View {
     @State public var favName: String = ""
     @Environment(\.presentationMode) var presentationMode
     
+    @State private var planCreator: String = ""
+    
+    @State private var isSheetPresented2 = false
+    
+    func canEdit() {
+        // Assuming you have a Firestore collection named "yourCollection" and a document with a specific documentID
+        let db = Firestore.firestore()
+        let docRef = db.collection("AllPlans").document(unique)
+
+        docRef.getDocument { document, error in
+            if let document = document, document.exists {
+                if let creator = document["creator"] as? String {
+                    self.planCreator = creator
+                }
+
+            } else {
+                print("Document does not exist")
+            }
+        }
+    }
+    
     func addPlanToCollection() {
-        if (isChecked) {
             let db = Firestore.firestore()
             
             // Reference to the subcollection
@@ -113,167 +133,136 @@ struct PlanInfoView: View {
                     print("Source document does not exist")
                 }
             }
-        } else {
-            let db = Firestore.firestore()
-
-            
-            // Reference to the document you want to query for values
-            let sourceDocRef = db.collection("AllPlans").document(unique)
-            
-            // Assuming you want to get the 'value1' and 'value2' fields from the source document
-            sourceDocRef.getDocument { (document, error) in
-                if let document = document, document.exists {
-                    // Extract the values from the source document
-                    let value1 = document.get("creator") as? String ?? ""
-                    let value2 = document.get("description") as? Int ?? 0
-                    let value3 = document.get("name") as? String ?? ""
-                    let value4 = document.get("verified") as? Int ?? 0
-                    
-                    // Create data for the new document
-                    let data: [String: Any] = [
-                        "creator": value1,
-                        "unique": unique,
-                        "description": value2,
-                        "display": value3,
-                        "verified": value4,
-                        "fav": "no"]
-                    
-                    // Reference to the destination document
-                    let destDocRef = db.collection("SelectedPlans").document("users").collection(authEmail).document(unique)
-                    
-                    // Set data to the destination document
-                    destDocRef.setData(data) { error in
-                        if let error = error {
-                            print("Error adding document: \(error.localizedDescription)")
-                        } else {
-                            print("Document added successfully!")
-                            showSuccessMessage = true
-                        }
-                    }
-                            
-
-                    
-                } else {
-                    print("Source document does not exist")
-                }
-            }
-        }
-
         self.presentationMode.wrappedValue.dismiss()
     }
     
     var body: some View {
-//        Text("Plan Info for \(unique)")
-//            .padding()\
-        VStack {
-        ScrollView {
-                RemoteImage3("gs://tfinal-a07fc.appspot.com/planPics/\(unique).jpg")
-                HStack {
-                    Spacer()
+        //        Text("Plan Info for \(unique)")
+        //            .padding()\
+            VStack {
+                ScrollView {
+                    RemoteImage4("gs://tfinal-a07fc.appspot.com/planPics/\(unique).jpg")
                     
-                    Text(name).font(.system(size: 22.5, weight: .bold))
+            
                     
-                    if verified.lowercased() == "yes" {
-                        Image(systemName: "checkmark.seal.fill")
-                            .foregroundColor(CustomColor.limeColor)
+                    HStack {
+                        Spacer()
                         
-                    }
-                    Spacer()
-                }
-                Text("@" + unique).font(.system(size: 17.5, design: .rounded))
-                
-                DisclosureGroup("Workout Split", isExpanded: $showE1) {
-                    EView1(documentID: unique)
-                }
-                .padding()
-                .foregroundColor(.black)
-                .font(.system(size: 20, design: .rounded))
-                .background(RoundedRectangle(cornerRadius: 5).fill(.white))
-                .shadow(color: Color.gray.opacity(0.2), radius: 4, x: 0, y: 2)
-                
-                DisclosureGroup("Dietary Strategy", isExpanded: $showE2) {
-                    EView2(documentID: unique)
-                }
-                .padding()
-                .foregroundColor(.black)
-                .font(.system(size: 20, design: .rounded))
-                .background(RoundedRectangle(cornerRadius: 5).fill(Color.white))
-                .shadow(color: Color.gray.opacity(0.2), radius: 4, x: 0, y: 2)
-                
-                DisclosureGroup("Additional Information", isExpanded: $showE3) {
-                    EView3(documentID: unique)
-                }
-                .padding()
-                .foregroundColor(.black)
-                .font(.system(size: 20, design: .rounded))
-                .background(RoundedRectangle(cornerRadius: 5).fill(Color.white))
-                .shadow(color: Color.gray.opacity(0.2), radius: 4, x: 0, y: 2)
-            
-            
-      
-            HStack {
-                Spacer()
-
-                      Text("Set to current plan")
-                    .font(.headline)
-
-                
-    
-                          Image(systemName: isChecked ? "checkmark.square.fill" : "square")
-                              .resizable()
-                              .frame(width: 20, height: 20)
-                              .foregroundColor(isChecked ? CustomColor.limeColor : .gray)
-                     
-                Spacer()
-
-                  }.onTapGesture {
-                      isChecked.toggle()
-                  }
-                  .padding()
-
-            Button(action: {
-                //findUserBMR()
-                showConfirmationAlert = true
-            }) {
-                
-                
-                Text("Add This Plan")
-                    .fontWeight(.semibold)
-                    .font(.system(size: 17.5)).padding()
-                    .frame(minWidth: 0, maxWidth: .infinity)
-                    .foregroundColor(.white)
-                    .background(.cyan)
-                    .cornerRadius(25)
-                    .padding(.leading)
-                    .padding(.trailing)
-            }
-              
-                .alert(isPresented: $showConfirmationAlert) {
-                    Alert(
-                        title: Text("Add Workout Plan"),
-                        message: Text("Are you sure you want to add this plan?"),
-                        primaryButton: .cancel(Text("Cancel")),
-                        secondaryButton: .default(Text("Confirm")) {
-                            addPlanToCollection()
-                           
+                        Text(name).font(.system(size: 22.5, weight: .bold))
+                        
+                        if verified.lowercased() == "yes" {
+                            Image(systemName: "checkmark.seal.fill")
+                                .foregroundColor(CustomColor.limeColor)
                             
                         }
+                        Spacer()
+                    }
+                    Text("@" + unique).font(.system(size: 17.5, design: .rounded))
+                    
+                    
+                    
+                    
+                    DisclosureGroup("Workout Split", isExpanded: $showE1) {
+                        EView4(documentID: unique)
+                    }
+                    .padding()
+                    .foregroundColor(.black)
+                    .font(.system(size: 20, design: .rounded))
+                    .background(RoundedRectangle(cornerRadius: 5).fill(.white))
+                    .shadow(color: Color.gray.opacity(0.2), radius: 4, x: 0, y: 2)
+                    
+                    DisclosureGroup("Dietary Strategy", isExpanded: $showE2) {
+                        EView5(documentID: unique)
+                    }
+                    .padding()
+                    .foregroundColor(.black)
+                    .font(.system(size: 20, design: .rounded))
+                    .background(RoundedRectangle(cornerRadius: 5).fill(Color.white))
+                    .shadow(color: Color.gray.opacity(0.2), radius: 4, x: 0, y: 2)
+                    
+                    DisclosureGroup("Additional Information", isExpanded: $showE3) {
+                        EView6(documentID: unique)
+                    }
+                    .padding()
+                    .foregroundColor(.black)
+                    .font(.system(size: 20, design: .rounded))
+                    .background(RoundedRectangle(cornerRadius: 5).fill(Color.white))
+                    .shadow(color: Color.gray.opacity(0.2), radius: 4, x: 0, y: 2)
+                    
+                    
+                    
+                    
+                    Button(action: {
+                        //findUserBMR()
+                        showConfirmationAlert = true
+                    }) {
+                        
+                        
+                        Text("Set To Current Plan")
+                            .fontWeight(.semibold)
+                            .font(.system(size: 17.5)).padding()
+                            .frame(minWidth: 0, maxWidth: .infinity)
+                            .foregroundColor(.white)
+                            .background(CustomColor.limeColor)
+                            .cornerRadius(25)
+                            .padding(.leading)
+                            .padding(.trailing)
+                    }  .alert(isPresented: $showConfirmationAlert) {
+                        Alert(
+                            title: Text("Add Workout Plan"),
+                            message: Text("Are you sure you want to add this plan?"),
+                            primaryButton: .cancel(Text("Cancel")),
+                            secondaryButton: .default(Text("Confirm")) {
+                                addPlanToCollection()
+                                
+                                
+                            }
+                        )
+                    }
+                    
+                    if(planCreator == authEmail) {
+                          HStack {
+                              Spacer()
+                              Text("Edit Plan").foregroundColor(.blue).font(.system(size: 17.5))
+                              Image(systemName: "pencil.circle")
+                                  .foregroundColor(.blue)
+                              Spacer()
+                              
+                          }.onTapGesture {
+                              isSheetPresented2.toggle()
+                          }
+                          .sheet(isPresented: $isSheetPresented2) {
+                              NavigationView {
+                                  ScrollView {
+                                      VStack {
+                                         
+                                          //Text(unique)
+                                          Spacer()
+                                          Text("Coming Soon").bold()
+                                          Spacer()
+                                      }.navigationBarItems(trailing: Button("Close") {
+                                          isSheetPresented2.toggle()
+                                      })
+                                  }
+                              }
+                          }.padding(.top)
+                    }
+                    
+                    
+                    Spacer()
+                    
+                }.padding(.leading, 2).padding(.trailing,2)
+                    .background(CustomColor.lgColor)
+                    .overlay(
+                        SuccessMessageView(message: "Workout plan added successfully!", isVisible: $showSuccessMessage)
                     )
-                }
-            Spacer()
-            
-            
-            }.padding(.leading, 2).padding(.trailing,2)
-                .background(CustomColor.lgColor)
-                .overlay(
-                    SuccessMessageView(message: "Workout plan added successfully!", isVisible: $showSuccessMessage)
-                )
+            }
+            .onAppear {
+                fetchNameFromFirestore()
+                canEdit()
+            }
         }
-        .onAppear {
-            fetchNameFromFirestore()
-        }
-    }
-    func fetchNameFromFirestore() {
+ func fetchNameFromFirestore() {
         let db = Firestore.firestore()
         let collectionReference = db.collection("AllPlans")
         let documentReference = collectionReference.document(unique)
@@ -296,14 +285,14 @@ struct PlanInfoView: View {
     }
 }
 
-struct PlanInfoView_Previews: PreviewProvider {
+struct BlockInfoFile_Previews: PreviewProvider {
     static var previews: some View {
         PlanInfoView(unique: "TestUnique", verified: "no")
     }
 }
 
 
-struct RemoteImage3: View {
+struct RemoteImage4: View {
     @State private var image: Image?
     let storagePath: String
     let labelText = "Bon's Fatburn" // Hardcoded label
@@ -345,7 +334,7 @@ struct RemoteImage3: View {
 }
 
 
-struct EView1: View {
+struct EView4: View {
     
     let documentID: String
     @State var dayType: String = ""
@@ -358,6 +347,7 @@ struct EView1: View {
     let auth = Auth.auth()
     let authEmail = "" + (Auth.auth().currentUser?.email ?? "")
     public var db = Firestore.firestore()
+    
 
     public func updateCurrentDay() {
         let calendar = Calendar.current
@@ -456,7 +446,7 @@ struct EView1: View {
     
 }
 
-struct EView2: View {
+struct EView5: View {
     let documentID: String
     
     @State private var selectedType: String = ""
@@ -554,7 +544,7 @@ struct EView2: View {
     }
 }
 
-struct EView3: View {
+struct EView6: View {
     @State private var selectedCategory: String = ""
     @State private var planDescription: String = ""
     
@@ -644,43 +634,5 @@ struct EView3: View {
                 print("Document does not exist")
             }
         }
-    }
-}
-
-
-struct CoolHStackView3: View {
-    @Binding var currentDay: Int
-    let dayNames: [String]
-    @ObservedObject var viewModel: ExerciseViewModel
-    let authEmail: String
-    let onTapGesture: () -> Void
-
-    var body: some View {
-        HStack(spacing: 5) {
-            ForEach(0..<7) { index in
-                ZStack {
-                    Circle()
-                        .frame(width: 32.5, height: 32.5)
-                        .foregroundColor(index == currentDay ? CustomColor.limeColor : Color.white)
-                        .overlay(Circle().stroke(CustomColor.limeColor, lineWidth: 2))
-                        .onTapGesture {
-                            currentDay = index
-                            onTapGesture() // Call the onTapGesture closure
-                            
-                            
-                            //viewModel.getAllData(email: authEmail, day: dayNames[currentDay], selectedPlan: "YourSelectedPlanName")
-                        }
-
-                    Text(String(dayNames[index].prefix(1)))
-                        .font(.system(size: 15, weight: index == currentDay ? .bold : .regular))
-                        .foregroundColor(index == currentDay ? .white : CustomColor.limeColor)
-                }
-
-                if index < 6 {
-                    Line()
-                }
-            }
-        }
-        .alignmentGuide(.leading) { d in d[.leading] }
     }
 }

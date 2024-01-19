@@ -8,11 +8,10 @@
 import Foundation
 import SwiftUI
 
-struct CurrentPlans: Identifiable {
+struct CurrentPlans {
     let display: String
     let unique: String
     var creator: String
     var fav: String
     
-    var id: String { unique }
 }

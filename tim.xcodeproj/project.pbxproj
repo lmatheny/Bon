@@ -24,6 +24,15 @@
 		5A4E872C2A54FC89003574C4 /* TodoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A4E872B2A54FC89003574C4 /* TodoViewModel.swift */; };
 		5A4E87302A550B65003574C4 /* Food.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A4E872F2A550B65003574C4 /* Food.swift */; };
 		5A4E87322A550BBC003574C4 /* GoalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A4E87312A550BBC003574C4 /* GoalViewModel.swift */; };
+		5A6419A72B5612CF00FEAFAD /* InfoBlockFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6419A62B5612CF00FEAFAD /* InfoBlockFile.swift */; };
+		5A6419A92B5703E400FEAFAD /* EditPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6419A82B5703E300FEAFAD /* EditPlanView.swift */; };
+		5A6419AB2B5716AE00FEAFAD /* CurrentPlansViewModel2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6419AA2B5716AE00FEAFAD /* CurrentPlansViewModel2.swift */; };
+		5A6419AD2B571D9000FEAFAD /* CreatorTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6419AC2B571D9000FEAFAD /* CreatorTabView.swift */; };
+		5A6419AF2B572CD100FEAFAD /* CreatorSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6419AE2B572CD000FEAFAD /* CreatorSettingsView.swift */; };
+		5A6419B12B572E5F00FEAFAD /* CreatorNotifView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6419B02B572E5F00FEAFAD /* CreatorNotifView.swift */; };
+		5A6419B32B572E7300FEAFAD /* CreatorPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6419B22B572E7300FEAFAD /* CreatorPostView.swift */; };
+		5A6419B52B5A1A2D00FEAFAD /* CreatorPostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6419B42B5A1A2D00FEAFAD /* CreatorPostViewModel.swift */; };
+		5A6419B72B5A1AED00FEAFAD /* CreatorPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A6419B62B5A1AED00FEAFAD /* CreatorPost.swift */; };
 		5AAD78012A531E470038EAB6 /* timApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAD78002A531E470038EAB6 /* timApp.swift */; };
 		5AAD78032A531E470038EAB6 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAD78022A531E470038EAB6 /* ContentView.swift */; };
 		5AAD78052A531E480038EAB6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5AAD78042A531E480038EAB6 /* Assets.xcassets */; };
@@ -64,6 +73,15 @@
 		5A4E872B2A54FC89003574C4 /* TodoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoViewModel.swift; sourceTree = "<group>"; };
 		5A4E872F2A550B65003574C4 /* Food.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Food.swift; sourceTree = "<group>"; };
 		5A4E87312A550BBC003574C4 /* GoalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalViewModel.swift; sourceTree = "<group>"; };
+		5A6419A62B5612CF00FEAFAD /* InfoBlockFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoBlockFile.swift; sourceTree = "<group>"; };
+		5A6419A82B5703E300FEAFAD /* EditPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPlanView.swift; sourceTree = "<group>"; };
+		5A6419AA2B5716AE00FEAFAD /* CurrentPlansViewModel2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentPlansViewModel2.swift; sourceTree = "<group>"; };
+		5A6419AC2B571D9000FEAFAD /* CreatorTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorTabView.swift; sourceTree = "<group>"; };
+		5A6419AE2B572CD000FEAFAD /* CreatorSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorSettingsView.swift; sourceTree = "<group>"; };
+		5A6419B02B572E5F00FEAFAD /* CreatorNotifView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorNotifView.swift; sourceTree = "<group>"; };
+		5A6419B22B572E7300FEAFAD /* CreatorPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorPostView.swift; sourceTree = "<group>"; };
+		5A6419B42B5A1A2D00FEAFAD /* CreatorPostViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorPostViewModel.swift; sourceTree = "<group>"; };
+		5A6419B62B5A1AED00FEAFAD /* CreatorPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorPost.swift; sourceTree = "<group>"; };
 		5AAD77FD2A531E470038EAB6 /* tim.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tim.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AAD78002A531E470038EAB6 /* timApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = timApp.swift; sourceTree = "<group>"; };
 		5AAD78022A531E470038EAB6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -108,6 +126,7 @@
 				5AE572F12AFC673600002144 /* Exercise.swift */,
 				5AE6F7E92B36137F0005855A /* CurrentPlans.swift */,
 				5ACF8AA32B423D6700E9D858 /* Plan.swift */,
+				5A6419B62B5A1AED00FEAFAD /* CreatorPost.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -115,7 +134,9 @@
 		5A4E872A2A54FC26003574C4 /* viewModel */ = {
 			isa = PBXGroup;
 			children = (
+				5A6419B42B5A1A2D00FEAFAD /* CreatorPostViewModel.swift */,
 				5A4E872B2A54FC89003574C4 /* TodoViewModel.swift */,
+				5A6419AA2B5716AE00FEAFAD /* CurrentPlansViewModel2.swift */,
 				5A4E87312A550BBC003574C4 /* GoalViewModel.swift */,
 				5ACD0F8C2A68C28000C4E77D /* FavFoodModel.swift */,
 				5AE572ED2AFC661A00002144 /* ExerciseViewModel.swift */,
@@ -128,6 +149,10 @@
 		5AAD77F42A531E460038EAB6 = {
 			isa = PBXGroup;
 			children = (
+				5A6419B22B572E7300FEAFAD /* CreatorPostView.swift */,
+				5A6419B02B572E5F00FEAFAD /* CreatorNotifView.swift */,
+				5A6419AE2B572CD000FEAFAD /* CreatorSettingsView.swift */,
+				5A6419A82B5703E300FEAFAD /* EditPlanView.swift */,
 				5AAD77FF2A531E470038EAB6 /* tim */,
 				B3C2A41E13A7CA40AA972B2A /* Pods */,
 				6B36AD833293FD552A0047FE /* Frameworks */,
@@ -172,6 +197,8 @@
 				5AE6F7EB2B363F210005855A /* PlanInfoView.swift */,
 				5AE6F7ED2B3D0B9E0005855A /* InfoCalDiff.swift */,
 				5ACF8AA72B439BF000E9D858 /* AccountView.swift */,
+				5A6419A62B5612CF00FEAFAD /* InfoBlockFile.swift */,
+				5A6419AC2B571D9000FEAFAD /* CreatorTabView.swift */,
 			);
 			path = tim;
 			sourceTree = "<group>";
@@ -317,13 +344,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A42483B2ADF7089000EE865 /* CustomToolBar.swift in Sources */,
+				5A6419AD2B571D9000FEAFAD /* CreatorTabView.swift in Sources */,
+				5A6419A72B5612CF00FEAFAD /* InfoBlockFile.swift in Sources */,
 				5A4248372ADF61D7000EE865 /* NewPlanView.swift in Sources */,
 				5A4248352ADF61C2000EE865 /* CommunityView.swift in Sources */,
 				5AE6F7EC2B363F210005855A /* PlanInfoView.swift in Sources */,
+				5A6419B12B572E5F00FEAFAD /* CreatorNotifView.swift in Sources */,
 				5A4E871B2A546BBE003574C4 /* DietView.swift in Sources */,
+				5A6419AB2B5716AE00FEAFAD /* CurrentPlansViewModel2.swift in Sources */,
 				5A4E871F2A546C72003574C4 /* VaultView.swift in Sources */,
 				5AAD78032A531E470038EAB6 /* ContentView.swift in Sources */,
 				5A4769562A772CD600F7E352 /* CBView.swift in Sources */,
+				5A6419A92B5703E400FEAFAD /* EditPlanView.swift in Sources */,
+				5A6419B72B5A1AED00FEAFAD /* CreatorPost.swift in Sources */,
 				5AE6F7E62B3212B00005855A /* HistoryView.swift in Sources */,
 				5AE6F7EA2B36137F0005855A /* CurrentPlans.swift in Sources */,
 				5ACD0F8D2A68C28000C4E77D /* FavFoodModel.swift in Sources */,
@@ -334,12 +367,15 @@
 				5A3CF8C22B2D24E500D5E53E /* CreatePlanView.swift in Sources */,
 				5ACD0F8F2A68C31400C4E77D /* aFav.swift in Sources */,
 				5A4E871D2A546BD5003574C4 /* BudgetView.swift in Sources */,
+				5A6419AF2B572CD100FEAFAD /* CreatorSettingsView.swift in Sources */,
 				5AE6F7E82B36134E0005855A /* CurrentPlansViewModel.swift in Sources */,
 				5ACD0F892A620C8600C4E77D /* CalcView.swift in Sources */,
+				5A6419B32B572E7300FEAFAD /* CreatorPostView.swift in Sources */,
 				5ACF8AA82B439BF000E9D858 /* AccountView.swift in Sources */,
 				5A4E87212A546DAF003574C4 /* NavView.swift in Sources */,
 				5AAD78012A531E470038EAB6 /* timApp.swift in Sources */,
 				5AE572F22AFC673600002144 /* Exercise.swift in Sources */,
+				5A6419B52B5A1A2D00FEAFAD /* CreatorPostViewModel.swift in Sources */,
 				5AE572EE2AFC661A00002144 /* ExerciseViewModel.swift in Sources */,
 				5A4E87322A550BBC003574C4 /* GoalViewModel.swift in Sources */,
 				5A4E87172A546B5A003574C4 /* PlannerView.swift in Sources */,

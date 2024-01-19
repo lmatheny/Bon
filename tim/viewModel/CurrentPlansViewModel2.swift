@@ -1,8 +1,14 @@
+//
+//  CurrentPlansViewModel2.swift
+//  tim
+//
+//  Created by Luke Matheny on 1/16/24.
+//
 import SwiftUI
 import Firebase
 import FirebaseFirestore
 
-class CurrentPlansViewModel: ObservableObject {
+class CurrentPlansViewModel2: ObservableObject {
     @Published var currentPlans: [CurrentPlans] = []
     let auth = Auth.auth()
     let authEmail = "" + (Auth.auth().currentUser?.email ?? "")
@@ -31,7 +37,7 @@ class CurrentPlansViewModel: ObservableObject {
                 }
 
                 // Ensure "Create New Plan" is the first element in the array
-                self.currentPlans = [CurrentPlans(display: "Create New Plan", unique: "test", creator: "test", fav: "test")]
+                //self.currentPlans = [CurrentPlans(display: "Create New Plan", unique: "test", creator: "test", fav: "test")]
 
                 for document in documents {
                     let data = document.data()
@@ -40,7 +46,7 @@ class CurrentPlansViewModel: ObservableObject {
                     let creator = data["creator"] as? String ?? ""
                     let fav = data["fav"] as? String ?? ""
 
-                    print("here: \(display), \(unique), \(creator), \(fav)")
+                    //print("here: \(display), \(unique), \(creator), \(fav)")
                     
                     let plan = CurrentPlans(display: display, unique: unique, creator: creator, fav: fav)
                     self.currentPlans.append(plan)

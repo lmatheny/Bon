@@ -8,7 +8,6 @@ struct LiftView: View {
     
     
     
-    
     let auth = Auth.auth()
     let storage = Storage.storage()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -17,6 +16,10 @@ struct LiftView: View {
     @ObservedObject private var viewModel = ExerciseViewModel()
     @ObservedObject private var currentPlansViewModel = CurrentPlansViewModel()
     @State public var emailStr = ""
+    @State public var v1 = ""
+    @State public var v2 = ""
+    @State public var tempU = ""
+    @State public var tempU2 = ""
     @State public var typeFromBD = ""
     @State public var updatedExercise = ""
 
@@ -35,6 +38,7 @@ struct LiftView: View {
 
     
     func setInitialSelectedPlan() {
+        
         if currentPlansViewModel.currentPlans.count > 1 {
             //selectedPlan = currentPlansViewModel.currentPlans[1].display
             
@@ -55,6 +59,10 @@ struct LiftView: View {
                     guard let document = querySnapshot?.documents.first else {
                         // No document with 'fav' equal to 'yes' found
                         print("No document with 'fav' equal to 'yes' found in subcollection for \(authEmail)")
+                        v1 = self.currentPlansViewModel.currentPlans.last?.display ?? ""
+                        v2 = self.currentPlansViewModel.currentPlans.last?.unique ?? ""
+                       selectedPlan = v1
+                       selectedSplit = v2
                         return
                     }
                     
@@ -242,7 +250,7 @@ struct LiftView: View {
                         
                         VStack(alignment: .leading) {
                             
-                            ForEach(currentPlansViewModel.currentPlans, id: \.display) { plan in
+                            ForEach(currentPlansViewModel.currentPlans, id: \.unique) { plan in
                                 Button(action: {
                                     if plan.display == "Create New Plan" {
                                        // isCreatingNewPlan = true
@@ -251,7 +259,6 @@ struct LiftView: View {
                                     } else {
                                         selectedSplit = plan.unique
                                         selectedPlan = plan.display
-                                        print("here")
                                         isExpanded.toggle()
                                     }
                                 }) {
@@ -259,7 +266,7 @@ struct LiftView: View {
                                         if plan.display != "Create New Plan" {
                                          
                                                   NavigationLink(
-                                                    destination: PlanInfoView(unique: plan.unique, verified: "no")
+                                                    destination: BlockInfoFile(unique: plan.unique, verified: "no")
                                                    
                                                 ) {
                                                     Image(systemName: "info.square")
@@ -310,17 +317,38 @@ struct LiftView: View {
                                                 .foregroundColor(.red).onTapGesture {
 //                                                    if let plan = currentPlansViewModel.currentPlans.first(where: { $0.display == selectedPlan }) {
 //                                                        deleteDocument(theName: plan.unique)
+                                                    //deleteDocument(theName: plan.unique)
+                                                    tempU = plan.unique
+                                                    tempU2 = plan.display
                                                     isDeleteAlertPresented = true
 //                                                    }
                                                 }.alert(isPresented: $isDeleteAlertPresented) {
                                                     Alert(
                                                         title: Text("Confirm Deletion"),
-                                                        message: Text("Are you sure you want to delete this plan?"),
+                                                        message: Text("Are you sure you want to remove this plan?"),
                                                         primaryButton: .destructive(Text("Delete")) {
                                                           
-                                                            if let plan = currentPlansViewModel.currentPlans.first(where: { $0.display == selectedPlan }) {
-                                                                deleteDocument(theName: plan.unique)
+                                                          
+                                                          
+                                                            if(selectedPlan == tempU2) {
+                                                                print("inside")
+                                                                
+                                                                if(self.currentPlansViewModel.currentPlans.count == 1) {
+                                                                    v1 = self.currentPlansViewModel.currentPlans.last?.display ?? ""
+                                                                    v2 = self.currentPlansViewModel.currentPlans.last?.unique ?? ""
+                                                                    
+                                                                    
+                                                                    selectedPlan = v1
+                                                                    selectedSplit = v2
+                                                                } else {
+                                                                    print("here my boi")
+                                                                    selectedPlan = "No Plans Added"
+                                                                }
                                                             }
+                                                      
+                                                            print("outside")
+                                                            //print("here now:" + plan.unique)
+                                                            deleteDocument(theName: tempU)
                                                             
                                                             isDeleteAlertPresented = false
                                                         },
@@ -423,15 +451,15 @@ struct LiftView: View {
                 }
             }
             .onAppear {
+                currentPlansViewModel.fetchUserDocumentData()  // Make sure this is called
                 updateCurrentDay()
                 printDocumentIDForFavorite()
-                currentPlansViewModel.fetchUserDocumentData()  // Make sure this is called
-
+    
                 // Wait for a short duration to allow the data to be fetched
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    setInitialSelectedPlan()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     getDayType(for: currentDay)
                     viewModel.getAllData(email: authEmail, day: dayNames[currentDay], selectedSplit: selectedSplit)
+                    setInitialSelectedPlan()
 
 
                     // Schedule a timer to check for the start of a new week every minute

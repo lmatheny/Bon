@@ -23,6 +23,7 @@ struct CreatePlanView: View {
    
     
     struct StepContentView: View {
+        @State public var favName: String = ""
         @State private var isConfirmationAlertPresented = false
         @State private var showSuccessMessage = false
         @State private var picChosen = false
@@ -130,14 +131,38 @@ struct CreatePlanView: View {
         @State private var isImagePickerPresented: Bool = false
         
         
+        
+        func makeNewFav() {
+            // Assuming you have Firebase initialized
+            let db = Firestore.firestore()
+            
+            db.collection("SelectedPlans").document("users").collection(authEmail).document(enteredTextAt).setData([
+                "creator": authEmail,
+                "description": enteredTextDesc,
+                "display": enteredTextName,
+                "verified": "no",
+                "fav": "yes",
+                "unique": enteredTextAt
+                
+            ]
+            
+            ) { err in
+            if let err = err {
+                print("Error adding document: \(err)")
+            } else {
+                print("Document added")
+                showSuccessMessage = true
+                
+            }}
+        }
         // Function to handle plan creation logic
         // Function to handle plan creation logic
         func addPlan() {
             // Check and set enteredCalories to "0" if it is empty
-//            if enteredCalories.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-//                enteredCalories = "0"
-//            }
-
+            //            if enteredCalories.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            //                enteredCalories = "0"
+            //            }
+            
             // Ensure that plan ID and plan name are not blank
             guard !enteredTextAt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
                 // Display an error view with a message for a blank Plan ID
@@ -148,7 +173,7 @@ struct CreatePlanView: View {
                 showError = true
                 return
             }
-
+            
             guard !enteredTextName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
                 // Display an error view with a message for a blank Plan Name
                 errorMessage = "Plan Name cannot be blank"
@@ -158,11 +183,11 @@ struct CreatePlanView: View {
                 showError = true
                 return
             }
-
+            
             // Query Firestore to check if the plan ID is unique
             let db = Firestore.firestore()
             let plansCollection = db.collection("AllPlans")
-
+            
             plansCollection.document(enteredTextAt).getDocument { (document, error) in
                 if let error = error {
                     // Handle the error, e.g., show an error view
@@ -188,7 +213,7 @@ struct CreatePlanView: View {
                             "unique": enteredTextAt
                         ])
                         { error in
-                        //plansCollection.document(enteredTextAt).setData([:]) { error in
+                            //plansCollection.document(enteredTextAt).setData([:]) { error in
                             if error != nil {
                                 // Handle the error, e.g., show an error view
                                 errorMessage = "An error occurred while creating the plan. Please try again."
@@ -198,10 +223,10 @@ struct CreatePlanView: View {
                                 createDietCollection(for: plansCollection.document(enteredTextAt))
                                 createOverviewCollection(for: plansCollection.document(enteredTextAt))
                                 createSplitCollection(for: plansCollection.document(enteredTextAt))
-
+                                
                                 // After the plan and subcollections are successfully created, show the success message
                                 showSuccessMessage = true
-
+                                
                                 // Example: Simulate a delay before navigating back
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                                     // Dismiss the view after the plan is added
@@ -212,7 +237,28 @@ struct CreatePlanView: View {
                     }
                 }
             }
-        }
+ 
+                
+                db.collection("SelectedPlans").document("users").collection(authEmail).document(enteredTextAt).setData([
+                    "creator": authEmail,
+                    "description": enteredTextDesc,
+                    "display": enteredTextName,
+                    "verified": "no",
+                    "fav": "no",
+                    "unique": enteredTextAt
+                    
+                ]
+                
+                ) { err in
+                if let err = err {
+                    print("Error adding document: \(err)")
+                } else {
+                    print("Document added")
+                    showSuccessMessage = true
+                    
+                }}
+
+    }
         
         
         
@@ -716,6 +762,7 @@ struct CreatePlanView: View {
 //                        .padding(.trailing, 2.5)
                     
                     
+                    
                     VStack {
                         HStack {
                             Text("Add a brief plan description")
@@ -738,6 +785,8 @@ struct CreatePlanView: View {
                         
                     }
                             
+                
+                  
                     
                     VStack {
                         
@@ -777,8 +826,7 @@ struct CreatePlanView: View {
                             }
                             
                         }
-                        
-                        
+     
                         .sheet(isPresented: $isSheetPresented) {
                             NavigationView {
                                 ScrollView {
@@ -806,7 +854,7 @@ struct CreatePlanView: View {
                                     .padding()
                                 }
                                 .navigationTitle("Select Category").bold()
-                                .navigationBarItems(trailing: Button("Cancel") {
+                                .navigationBarItems(trailing: Button("Close") {
                                     isSheetPresented.toggle()
                                 })
                             }
